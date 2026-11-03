@@ -1,57 +1,60 @@
+let playerScore = 0;
+let computerScore = 0;
+
+// Cache DOM elements
+const playerScoreEl = document.querySelector('#player-score');
+const computerScoreEl = document.querySelector('#computer-score');
+const resultLog = document.querySelector('#result-log');
+
+const rockBtn = document.querySelector('#rock');
+const paperBtn = document.querySelector('#paper');
+const scissorsBtn = document.querySelector('#scissors');
+
 function getComputerChoice() {
-    const choices = ["Rock", "Paper", "Scissors"];
-    return choices[Math.floor(Math.random() * choices.length)];
+    const choices = ['rock', 'paper', 'scissors'];
+    const randomIndex = Math.floor(Math.random() * choices.length);
+    return choices[randomIndex];
 }
 
-function getHumanChoice() {
-    let input = prompt("Choose Rock, Paper, or Scissors:");
-    if (!input) return "";
-    return input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
-}
+function playRound(playerSelection) {
+    if (playerScore >= 5 || computerScore >= 5) return;
 
-function playRound(human, computer) {
-    if (human === computer) return "tie";
-    
-    if (
-        (human === "Rock" && computer === "Scissors") ||
-        (human === "Paper" && computer === "Rock") ||
-        (human === "Scissors" && computer === "Paper")
+    const computerSelection = getComputerChoice();
+    let roundMessage = '';
+
+    if (playerSelection === computerSelection) {
+        roundMessage = `It's a tie! Both chose ${playerSelection}.`;
+    } else if (
+        (playerSelection === 'rock' && computerSelection === 'scissors') ||
+        (playerSelection === 'paper' && computerSelection === 'rock') ||
+        (playerSelection === 'scissors' && computerSelection === 'paper')
     ) {
-        return "win";
-    }
-    
-    return "lose";
-}
-
-function playGame() {
-    let humanScore = 0;
-    let computerScore = 0;
-
-    for (let i = 0; i < 5; i++) {
-        const human = getHumanChoice();
-        const computer = getComputerChoice();
-        const result = playRound(human, computer);
-
-        if (result === "win") {
-            humanScore++;
-            alert(`Round ${i + 1}: You Win! (${human} beats ${computer})\nScore — You: ${humanScore}, Computer: ${computerScore}`);
-        } else if (result === "lose") {
-            computerScore++;
-            alert(`Round ${i + 1}: You Lose! (${computer} beats ${human})\nScore — You: ${humanScore}, Computer: ${computerScore}`);
-        } else {
-            alert(`Round ${i + 1}: It's a Tie! (Both chose ${human})\nScore — You: ${humanScore}, Computer: ${computerScore}`);
-        }
-    }
-
-    // Final Game Results
-    if (humanScore > computerScore) {
-        alert(`Congratulations! You won the game! Final Score: ${humanScore} - ${computerScore}`);
-    } else if (humanScore < computerScore) {
-        alert(` Bummer! You lost the game. Final Score: ${humanScore} - ${computerScore}`);
+        playerScore++;
+        roundMessage = `You win this round! ${playerSelection} beats ${computerSelection}.`;
     } else {
-        alert(` Wow, it's an overall tie game! Final Score: ${humanScore} - ${computerScore}`);
+        computerScore++;
+        roundMessage = `You lose this round! ${computerSelection} beats ${playerSelection}.`;
+    }
+
+    playerScoreEl.textContent = playerScore;
+    computerScoreEl.textContent = computerScore;
+    resultLog.textContent = roundMessage;
+
+    if (playerScore === 5) {
+        resultLog.textContent = `Game Over! You won the game ${playerScore} to ${computerScore}!`;
+        disableButtons();
+    } else if (computerScore === 5) {
+        resultLog.textContent = ` Game Over! The computer won the game ${computerScore} to ${playerScore}.`;
+        disableButtons();
     }
 }
 
-alert("Starting game...");
-playGame();
+function disableButtons() {
+    rockBtn.disabled = true;
+    paperBtn.disabled = true;
+    scissorsBtn.disabled = true;
+}
+
+rockBtn.addEventListener('click', () => playRound('rock'));
+paperBtn.addEventListener('click', () => playRound('paper'));
+scissorsBtn.addEventListener('click', () => playRound('scissors'));
